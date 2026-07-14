@@ -8,14 +8,15 @@ const {
   getComplaints,
   updateComplaintStatus,
   getDashboardStats,
+  getMyComplaints,
+  getMyStats,
 } = require("../controllers/complaintController");
 
 router.post("/", authMiddleware, createComplaint);
-
-router.get("/", getComplaints);
-
-router.get("/stats", getDashboardStats);
-
-router.put("/:id", updateComplaintStatus);
+router.get("/", authMiddleware, getComplaints);
+router.get("/my", authMiddleware, getMyComplaints);
+router.get("/my/stats", authMiddleware, getMyStats);
+router.get("/stats", authMiddleware, getDashboardStats);
+router.put("/:id", authMiddleware, updateComplaintStatus);
 
 module.exports = router;

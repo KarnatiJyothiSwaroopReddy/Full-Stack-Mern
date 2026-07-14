@@ -27,7 +27,7 @@ exports.createComplaint = async (req, res) => {
 // Get All Complaints
 exports.getComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find();
+    const complaints = await Complaint.find().populate("userId", "name email");
 
     res.status(200).json(complaints);
   } catch (error) {
@@ -46,7 +46,7 @@ exports.updateComplaintStatus = async (req, res) => {
       req.params.id,
       { status },
       { new: true }
-    );
+    ).populate("userId", "name email");
 
     if (!complaint) {
       return res.status(404).json({
@@ -83,6 +83,40 @@ exports.getDashboardStats = async (req, res) => {
     const resolved = complaints.filter(
       (c) => c.status === "Resolved"
     ).length;
+
+    res.status(200).json({
+      total,
+      pending,
+      inProgress,
+      resolved,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// Get Logged In User's Complaints
+exports.getMyComplaints = async (req, res) => {
+  try {
+    const complaints = await Complaint.find({ userId: req.user.id });
+    res.status(200).json(complaints);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// Get Logged In User's Dashboard Statistics
+exports.getMyStats = async (req, res) => {
+  try {
+    const complaints = await Complaint.find({ userId: req.user.id });
+    const total = complaints.length;
+    const pending = complaints.filter((c) => c.status === "Pending").length;
+    const inProgress = complaints.filter((c) => c.status === "In Progress").length;
+    const resolved = complaints.filter((c) => c.status === "Resolved").length;
 
     res.status(200).json({
       total,

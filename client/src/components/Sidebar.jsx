@@ -10,7 +10,27 @@ import {
 } from "react-icons/fa";
 
 function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      const saved = localStorage.getItem("sidebarCollapsed");
+      return saved === "true";
+    } catch (e) {
+      return false;
+    }
+  });
+
+  // persist collapsed state
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("sidebarCollapsed", next);
+      } catch (e) {
+        // ignore
+      }
+      return next;
+    });
+  };
   const location = useLocation();
 
   const menu = [
@@ -36,6 +56,16 @@ function Sidebar() {
     }
   ];
 
+  // filter menu based on role
+  const role = typeof window !== "undefined" ? localStorage.getItem("role") : null;
+  const filteredMenu = menu.filter((item) => {
+    if (role === "admin") {
+      return item.path === "/admin";
+    } else {
+      return item.path !== "/admin";
+    }
+  });
+
   return (
     <div className={`${collapsed ? "w-20" : "w-72"} min-h-screen bg-slate-900 text-white shadow-2xl transition-all duration-300 overflow-hidden z-10`}>
       <div className={`p-6 border-b border-slate-700 relative ${collapsed ? "flex items-center justify-center" : "flex items-center justify-start"} overflow-hidden` }>
@@ -44,7 +74,7 @@ function Sidebar() {
         </div>
 
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={toggleCollapsed}
           className="absolute right-3 top-3 bg-slate-800 hover:bg-slate-700 p-2 rounded text-sm"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
@@ -53,7 +83,7 @@ function Sidebar() {
       </div>
 
       <div className="p-3 space-y-2">
-        {menu.map((item) => (
+        {filteredMenu.map((item) => (
           <Link
             key={item.path}
             to={item.path}

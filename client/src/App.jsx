@@ -7,6 +7,8 @@ import CreateComplaint from "./pages/CreateComplaint";
 import MyComplaints from "./pages/MyComplaints";
 import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
   return (
@@ -32,23 +34,39 @@ function App() {
       {/* User Routes */}
       <Route
         path="/dashboard"
-        element={<Dashboard />}
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
       />
 
       <Route
         path="/create-complaint"
-        element={<CreateComplaint />}
+        element={
+          <ProtectedRoute>
+            <CreateComplaint />
+          </ProtectedRoute>
+        }
       />
 
       <Route
         path="/my-complaints"
-        element={<MyComplaints />}
+        element={
+          <ProtectedRoute>
+            <MyComplaints />
+          </ProtectedRoute>
+        }
       />
 
       {/* Admin Route */}
       <Route
         path="/admin"
-        element={<AdminDashboard />}
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        }
       />
 
       {/* Invalid Routes */}
@@ -61,9 +79,13 @@ function App() {
         }
       />
       <Route
-  path="/profile"
-  element={<Profile />}
-/>
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
 
     </Routes>
   );

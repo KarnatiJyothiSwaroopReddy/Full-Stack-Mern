@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 
 exports.registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     const existingUser = await User.findOne({ email });
 
@@ -15,10 +15,15 @@ exports.registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // validate role, default to 'user'
+    const allowedRoles = ["user", "admin"];
+    const userRole = allowedRoles.includes(role) ? role : "user";
+
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
+      role: userRole,
     });
 
     res.status(201).json({
@@ -79,6 +84,24 @@ exports.loginUser = async (req, res) => {
         role: user.role,
       },
     });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// Get All Users (Admin Only)
+exports.getAllUsers = async (req, res) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Access Denied: Admins Only",
+      });
+    }
+
+    const users = await User.find({}, "-password");
+    res.status(200).json(users);
   } catch (error) {
     res.status(500).json({
       message: error.message,

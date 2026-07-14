@@ -16,7 +16,7 @@ function Header() {
 
       <button
         onClick={logout}
-        className="bg-red-500 text-white px-5 py-2 rounded-xl hover:bg-red-600"
+        className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600"
       >
         Logout
       </button>
